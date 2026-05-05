@@ -1,65 +1,82 @@
-import Image from "next/image";
+'use client';
+import { useState } from 'react';
+import { Letter } from '@/components/Letter';
+import { Envelope } from '@/components/Envelope';
+import { motion, AnimatePresence } from 'framer-motion';
+import confetti from 'canvas-confetti';
+import { FlowStage } from '@/types';
 
-export default function Home() {
+export default function ProposalPage() {
+  const [stage, setStage] = useState<FlowStage>('closed');
+
+  const handleOpen = () => {
+    setStage('reading');
+    // Optional: Smooth scroll down after delay
+    setTimeout(() => {
+      window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
+    }, 1500);
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <main className="bg-[#fffafa] transition-colors duration-1000">
+      {/* Stage 1: The Envelope */}
+      <div className="h-screen flex flex-col items-center justify-center">
+        <Envelope isOpen={stage !== 'closed'} onClick={handleOpen} />
+      </div>
+
+      {/* Stage 2: The Reading Journey */}
+      {stage !== 'closed' && (
+        <>
+          <Letter />
+
+          {/* Stage 3: The Missing Piece Reveal */}
+          <div className="h-screen flex flex-col items-center justify-center bg-white border-t border-rose-50">
+            <AnimatePresence mode="wait">
+              {stage === 'reading' ? (
+                <motion.button
+                  key="trigger"
+                  onClick={() => setStage('asking')}
+                  whileHover={{ scale: 1.05 }}
+                  className="text-slate-400 italic underline decoration-rose-300 underline-offset-8"
+                >
+                  Wait... I feel like something is still missing?
+                </motion.button>
+              ) : stage === 'asking' ? (
+                <motion.div
+                  key="proposal"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="text-center space-y-12"
+                >
+                  <h2 className="text-5xl md:text-7xl font-serif text-slate-900">
+                    Will you be my girlfriend?
+                  </h2>
+                  <div className="flex gap-8 justify-center">
+                    <button
+                      onClick={() => {
+                        confetti({ particleCount: 200, spread: 80 });
+                        setStage('accepted');
+                      }}
+                      className="bg-rose-500 text-white px-14 py-4 rounded-full text-xl font-medium hover:bg-rose-600 transition-all shadow-xl"
+                    >
+                      Yes!
+                    </button>
+                  </div>
+                </motion.div>
+              ) : (
+                <motion.h2
+                  key="final"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-6xl font-serif italic text-rose-500"
+                >
+                  Finally. ❤️
+                </motion.h2>
+              )}
+            </AnimatePresence>
+          </div>
+        </>
+      )}
+    </main>
   );
 }
