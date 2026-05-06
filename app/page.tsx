@@ -1,81 +1,144 @@
+// 'use client';
+// import { useState, useEffect } from 'react';
+// import { Letter } from '@/components/Letter';
+// import { Envelope } from '@/components/Envelope';
+// import { motion, AnimatePresence } from 'framer-motion';
+
+// export default function ProposalPage() {
+//   const [stage, setStage] = useState<'closed' | 'opening' | 'revealed' | 'zooming'>('closed');
+//   const [isReading, setIsReading] = useState(false);
+
+//   // Transition from Opening -> Revealed
+//   useEffect(() => {
+//     if (stage === 'opening') {
+//       const timer = setTimeout(() => setStage('revealed'), 2200); // Wait for flap
+//       return () => clearTimeout(timer);
+//     }
+//   }, [stage]);
+
+//   return (
+//     <main className="min-h-screen bg-[#1a1a2e] overflow-x-hidden">
+//       <AnimatePresence mode="wait">
+//         {!isReading ? (
+//           <motion.div
+//             key="envelope-zone"
+//             exit={{ opacity: 0 }}
+//             className="h-screen flex items-center justify-center relative"
+//           >
+//             <Envelope
+//               stage={stage}
+//               onFinishReveal={() => setStage('zooming')}
+//             />
+
+//             {stage === 'closed' && (
+//               <motion.button
+//                 initial={{ opacity: 0 }}
+//                 animate={{ opacity: 1 }}
+//                 onClick={() => setStage('opening')}
+//                 className="absolute bottom-20 text-rose-300 font-serif italic text-xl tracking-widest cursor-pointer"
+//               >
+//                 Tap to Open Your Letter
+//               </motion.button>
+//             )}
+//           </motion.div>
+//         ) : (
+//           <motion.div
+//             key="content-zone"
+//             initial={{ opacity: 0 }}
+//             animate={{ opacity: 1 }}
+//             transition={{ duration: 1.5 }}
+//           >
+//             <Letter />
+//           </motion.div>
+//         )}
+//       </AnimatePresence>
+
+//       {/* Background Effect */}
+//       {stage === 'zooming' && !isReading && (
+//         <motion.div
+//           onAnimationComplete={() => setIsReading(true)}
+//           className="fixed inset-0 bg-white z-[100]"
+//           initial={{ opacity: 0 }}
+//           animate={{ opacity: 1 }}
+//           transition={{ duration: 1.2, delay: 0.5 }}
+//         />
+//       )}
+//     </main>
+//   );
+// }
+
+
+
+
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Letter } from '@/components/Letter';
 import { Envelope } from '@/components/Envelope';
+import { FloatingHearts } from '@/components/FloatingHearts';
 import { motion, AnimatePresence } from 'framer-motion';
-import confetti from 'canvas-confetti';
-import { FlowStage } from '@/types';
 
 export default function ProposalPage() {
-  const [stage, setStage] = useState<FlowStage>('closed');
+  const [stage, setStage] = useState<'closed' | 'opening' | 'revealed' | 'zooming'>('closed');
+  const [isReading, setIsReading] = useState(false);
 
-  const handleOpen = () => {
-    setStage('reading');
-    // Optional: Smooth scroll down after delay
-    setTimeout(() => {
-      window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
-    }, 1500);
-  };
+  useEffect(() => {
+    if (stage === 'opening') {
+      const timer = setTimeout(() => setStage('revealed'), 2200);
+      return () => clearTimeout(timer);
+    }
+  }, [stage]);
 
   return (
-    <main className="bg-[#fffafa] transition-colors duration-1000">
-      {/* Stage 1: The Envelope */}
-      <div className="h-screen flex flex-col items-center justify-center">
-        <Envelope isOpen={stage !== 'closed'} onClick={handleOpen} />
-      </div>
+    // Updated background to a softer, romantic mesh-style gradient
+    <main className="min-h-screen bg-gradient-to-b from-[#1a1a2e] via-[#2d1b33] to-[#1a1a2e] overflow-x-hidden relative">
 
-      {/* Stage 2: The Reading Journey */}
-      {stage !== 'closed' && (
-        <>
-          <Letter />
+      {/* Dynamic Background Layer */}
+      {!isReading && <FloatingHearts />}
 
-          {/* Stage 3: The Missing Piece Reveal */}
-          <div className="h-screen flex flex-col items-center justify-center bg-white border-t border-rose-50">
-            <AnimatePresence mode="wait">
-              {stage === 'reading' ? (
-                <motion.button
-                  key="trigger"
-                  onClick={() => setStage('asking')}
-                  whileHover={{ scale: 1.05 }}
-                  className="text-slate-400 italic underline decoration-rose-300 underline-offset-8"
-                >
-                  Wait... I feel like something is still missing?
-                </motion.button>
-              ) : stage === 'asking' ? (
-                <motion.div
-                  key="proposal"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="text-center space-y-12"
-                >
-                  <h2 className="text-5xl md:text-7xl font-serif text-slate-900">
-                    Will you be my girlfriend?
-                  </h2>
-                  <div className="flex gap-8 justify-center">
-                    <button
-                      onClick={() => {
-                        confetti({ particleCount: 200, spread: 80 });
-                        setStage('accepted');
-                      }}
-                      className="bg-rose-500 text-white px-14 py-4 rounded-full text-xl font-medium hover:bg-rose-600 transition-all shadow-xl"
-                    >
-                      Yes!
-                    </button>
-                  </div>
-                </motion.div>
-              ) : (
-                <motion.h2
-                  key="final"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="text-6xl font-serif italic text-rose-500"
-                >
-                  Finally. ❤️
-                </motion.h2>
-              )}
-            </AnimatePresence>
-          </div>
-        </>
+      <AnimatePresence mode="wait">
+        {!isReading ? (
+          <motion.div
+            key="envelope-zone"
+            exit={{ opacity: 0 }}
+            className="h-screen flex items-center justify-center relative z-10"
+          >
+            <Envelope
+              stage={stage}
+              onFinishReveal={() => setStage('zooming')}
+            />
+
+            {stage === 'closed' && (
+              <motion.button
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                onClick={() => setStage('opening')}
+                className="absolute bottom-20 text-rose-200 font-serif italic text-xl tracking-widest cursor-pointer hover:text-rose-400 transition-colors"
+              >
+                Tap to Open Your Letter
+              </motion.button>
+            )}
+          </motion.div>
+        ) : (
+          <motion.div
+            key="content-zone"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1.5 }}
+          >
+            <Letter />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Background Effect for the Zoom transition */}
+      {stage === 'zooming' && !isReading && (
+        <motion.div
+          onAnimationComplete={() => setIsReading(true)}
+          className="fixed inset-0 bg-white z-[100]"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1.2, delay: 0.5 }}
+        />
       )}
     </main>
   );
