@@ -1,75 +1,3 @@
-// 'use client';
-// import { useState, useEffect } from 'react';
-// import { Letter } from '@/components/Letter';
-// import { Envelope } from '@/components/Envelope';
-// import { motion, AnimatePresence } from 'framer-motion';
-
-// export default function ProposalPage() {
-//   const [stage, setStage] = useState<'closed' | 'opening' | 'revealed' | 'zooming'>('closed');
-//   const [isReading, setIsReading] = useState(false);
-
-//   // Transition from Opening -> Revealed
-//   useEffect(() => {
-//     if (stage === 'opening') {
-//       const timer = setTimeout(() => setStage('revealed'), 2200); // Wait for flap
-//       return () => clearTimeout(timer);
-//     }
-//   }, [stage]);
-
-//   return (
-//     <main className="min-h-screen bg-[#1a1a2e] overflow-x-hidden">
-//       <AnimatePresence mode="wait">
-//         {!isReading ? (
-//           <motion.div
-//             key="envelope-zone"
-//             exit={{ opacity: 0 }}
-//             className="h-screen flex items-center justify-center relative"
-//           >
-//             <Envelope
-//               stage={stage}
-//               onFinishReveal={() => setStage('zooming')}
-//             />
-
-//             {stage === 'closed' && (
-//               <motion.button
-//                 initial={{ opacity: 0 }}
-//                 animate={{ opacity: 1 }}
-//                 onClick={() => setStage('opening')}
-//                 className="absolute bottom-20 text-rose-300 font-serif italic text-xl tracking-widest cursor-pointer"
-//               >
-//                 Tap to Open Your Letter
-//               </motion.button>
-//             )}
-//           </motion.div>
-//         ) : (
-//           <motion.div
-//             key="content-zone"
-//             initial={{ opacity: 0 }}
-//             animate={{ opacity: 1 }}
-//             transition={{ duration: 1.5 }}
-//           >
-//             <Letter />
-//           </motion.div>
-//         )}
-//       </AnimatePresence>
-
-//       {/* Background Effect */}
-//       {stage === 'zooming' && !isReading && (
-//         <motion.div
-//           onAnimationComplete={() => setIsReading(true)}
-//           className="fixed inset-0 bg-white z-[100]"
-//           initial={{ opacity: 0 }}
-//           animate={{ opacity: 1 }}
-//           transition={{ duration: 1.2, delay: 0.5 }}
-//         />
-//       )}
-//     </main>
-//   );
-// }
-
-
-
-
 'use client';
 import { useState, useEffect } from 'react';
 import { Letter } from '@/components/Letter';
@@ -83,16 +11,13 @@ export default function ProposalPage() {
 
   useEffect(() => {
     if (stage === 'opening') {
-      const timer = setTimeout(() => setStage('revealed'), 2200);
+      const timer = setTimeout(() => setStage('revealed'), 1600);
       return () => clearTimeout(timer);
     }
   }, [stage]);
 
   return (
-    // Updated background to a softer, romantic mesh-style gradient
-    <main className="min-h-screen bg-gradient-to-b from-[#1a1a2e] via-[#2d1b33] to-[#1a1a2e] overflow-x-hidden relative">
-
-      {/* Dynamic Background Layer */}
+    <main className="min-h-screen bg-[#1a1a2e] overflow-hidden relative">
       {!isReading && <FloatingHearts />}
 
       <AnimatePresence mode="wait">
@@ -102,10 +27,12 @@ export default function ProposalPage() {
             exit={{ opacity: 0 }}
             className="h-screen flex items-center justify-center relative z-10"
           >
-            <Envelope
-              stage={stage}
-              onFinishReveal={() => setStage('zooming')}
-            />
+            <div onClick={() => stage === 'closed' && setStage('opening')}>
+              <Envelope
+                stage={stage}
+                onFinishReveal={() => setStage('zooming')}
+              />
+            </div>
 
             {stage === 'closed' && (
               <motion.button
@@ -130,14 +57,14 @@ export default function ProposalPage() {
         )}
       </AnimatePresence>
 
-      {/* Background Effect for the Zoom transition */}
+      {/* The "White Flash" transition synchronized with the Letter Zoom */}
       {stage === 'zooming' && !isReading && (
         <motion.div
           onAnimationComplete={() => setIsReading(true)}
-          className="fixed inset-0 bg-white z-[100]"
+          className="fixed inset-0 bg-[#fff9fa] z-[100]"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 1.2, delay: 0.5 }}
+          transition={{ duration: 1, delay: 1.8 }}
         />
       )}
     </main>
