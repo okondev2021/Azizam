@@ -24,7 +24,10 @@ const sections = [
         body: "I told you once that my only dream is to be happy. I want you to know that you are the major component in that dream becoming a reality."
     },
     {
-        body: "I am always at my happiest when I am talking to you. I love you so, so much, and I want things to stay this way."
+        body: "I am always at my happiest when I spend time with you and I want to always make you happy azizam."
+    },
+    {
+        body: "I cherish you and i love you so, so much azizam. I promise to always make you happy and make your happiness my top priority."
     },
     {
         isFinal: true,
